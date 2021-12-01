@@ -1,11 +1,13 @@
 use std::error::Error;
 use std::fs;
 use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 pub fn vector_from_file<T>(filename: &str) -> Result<Vec<T>, Box<dyn Error>>
-    where T: FromStr, T::Err: 'static + Error
+where
+    T: FromStr,
+    T::Err: 'static + Error,
 {
     let mut v: Vec<T> = Vec::new();
     let file = File::open(filename)?;
@@ -20,12 +22,16 @@ pub fn vector_from_file<T>(filename: &str) -> Result<Vec<T>, Box<dyn Error>>
 }
 
 pub fn vector_from_comma_separated_file<T>(filename: &str) -> Result<Vec<T>, Box<dyn Error>>
-    where T: FromStr, T::Err: 'static + Error
+where
+    T: FromStr,
+    T::Err: 'static + Error,
 {
     let line = fs::read_to_string(filename)?;
-    let v = line.trim().split(',')
+    let v = line
+        .trim()
+        .split(',')
         .map(|x| x.parse::<T>().unwrap())
         .collect();
-    
+
     Ok(v)
 }
