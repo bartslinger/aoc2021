@@ -5,90 +5,93 @@ mod tests {
     #[test]
     fn example_report() {
         let input = aoc::vector_from_file::<String>("input/day02/example").unwrap();
-        let (horizontal, depth) = travel(&input);
-        assert_eq!(horizontal, 15);
-        assert_eq!(depth, 10);
+        let state = travel(&input);
+        assert_eq!(state.horizontal, 15);
+        assert_eq!(state.depth, 10);
+        assert_eq!(answer(state), 150);
     }
 
     #[test]
     fn example_part_two() {
         let input = aoc::vector_from_file::<String>("input/day02/example").unwrap();
-        let (horizontal, _aim, depth) = aim(&input);
-        assert_eq!(horizontal, 15);
-        assert_eq!(depth, 60);
+        let state = travel_with_aim(&input);
+        assert_eq!(state.horizontal, 15);
+        assert_eq!(state.depth, 60);
+        assert_eq!(answer(state), 900);
     }
 }
 
 #[derive(Debug)]
-enum Direction {
-    Forward,
-    Down,
-    Up,
-}
-
-#[derive(Debug)]
 struct Command {
-    direction: Direction,
-    value: i32,
+    horizontal: i32,
+    down: i32,
 }
 
 impl From<&String> for Command {
     fn from(input: &String) -> Command {
         let mut parts = input.split(' ');
-        Command {
-            direction: match parts.next() {
-                Some("forward") => Direction::Forward,
-                Some("up") => Direction::Up,
-                Some("down") => Direction::Down,
-                _ => Direction::Forward,
+        let direction = parts.next().unwrap();
+        let value = i32::from_str_radix(parts.next().unwrap(), 10).unwrap();
+        match direction {
+            "forward" => Command {
+                horizontal: value,
+                down: 0,
             },
-            value: i32::from_str_radix(parts.next().unwrap(), 10).unwrap(),
+            "up" => Command {
+                horizontal: 0,
+                down: -value,
+            },
+            "down" => Command {
+                horizontal: 0,
+                down: value,
+            },
+            _ => panic!("Incorrect input"),
         }
     }
 }
 
-fn travel(input: &Vec<String>) -> (i32, i32) {
-    input
-        .iter()
-        .map(|x| {
-            let cmd = Command::from(x);
-            match cmd.direction {
-                Direction::Forward => (cmd.value, 0),
-                Direction::Down => (0, cmd.value),
-                Direction::Up => (0, -cmd.value),
-            }
-        })
-        .fold((0, 0), |pos, step| (pos.0 + step.0, pos.1 + step.1))
+#[derive(Default)]
+struct TravelState {
+    horizontal: i32,
+    depth: i32,
 }
 
-fn aim(input: &Vec<String>) -> (i32, i32, i32) {
+fn travel(input: &Vec<String>) -> TravelState {
+    input
+        .iter()
+        .map(|x| Command::from(x))
+        .fold(TravelState::default(), |mut state, step| {
+            state.horizontal += step.horizontal;
+            state.depth += step.down;
+            state
+        })
+}
+
+fn travel_with_aim(input: &Vec<String>) -> TravelState {
     // forward, aim, depth
     input
         .iter()
-        .map(|x| {
-            let cmd = Command::from(x);
-            match cmd.direction {
-                Direction::Forward => (cmd.value, 0),
-                Direction::Down => (0, cmd.value),
-                Direction::Up => (0, -cmd.value),
-            }
+        .map(|x| Command::from(x))
+        .fold((TravelState::default(), 0), |mut state, step| {
+            state.0.horizontal += step.horizontal;
+            state.1 += step.down;
+            state.0.depth += state.1 * step.horizontal;
+            state
         })
-        .fold((0, 0, 0), |state, step| {
-            (
-                state.0 + step.0,
-                state.1 + step.1,
-                state.2 + state.1 * step.0,
-            )
-        })
+        .0
+}
+
+fn answer(state: TravelState) -> i32 {
+    state.horizontal * state.depth
 }
 
 fn main() {
     let input = aoc::vector_from_file::<String>("input/day02/input").unwrap();
-    let (horizontal, depth) = travel(&input);
-    println!("Horizontal: {}; Depth: {}", horizontal, depth);
-    println!("Part 1: {}", horizontal * depth);
+    let state = travel(&input);
+    println!("Horizontal: {}; Depth: {}", state.horizontal, state.depth);
+    println!("Part 1: {}", answer(state));
 
-    let (horizontal, _aim, depth) = aim(&input);
-    println!("Horizontal: {}; Depth: {}", horizontal, depth);
-    println!("Part 2: {}", horizontal * depth);
+    let state = travel_with_aim(&input);
+    println!("Horizontal: {}; Depth: {}", state.horizontal, state.depth);
+    println!("Part 2: {}", answer(state));
 }
