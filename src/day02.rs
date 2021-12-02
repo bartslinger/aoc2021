@@ -4,7 +4,7 @@ mod tests {
 
     #[test]
     fn example_report() {
-        let input = aoc::vector_from_file::<String>("input/day02/example").unwrap();
+        let input = commands_from_file("input/day02/example");
         let state = travel(&input);
         assert_eq!(state.horizontal, 15);
         assert_eq!(state.depth, 10);
@@ -13,7 +13,7 @@ mod tests {
 
     #[test]
     fn example_part_two() {
-        let input = aoc::vector_from_file::<String>("input/day02/example").unwrap();
+        let input = commands_from_file("input/day02/example");
         let state = travel_with_aim(&input);
         assert_eq!(state.horizontal, 15);
         assert_eq!(state.depth, 60);
@@ -50,16 +50,23 @@ impl From<&String> for Command {
     }
 }
 
+fn commands_from_file(filename: &str) -> Vec<Command> {
+    let input = aoc::vector_from_file::<String>(filename).unwrap();
+    input
+        .iter()
+        .map(|x| Command::from(x))
+        .collect()
+}
+
 #[derive(Default)]
 struct TravelState {
     horizontal: i32,
     depth: i32,
 }
 
-fn travel(input: &Vec<String>) -> TravelState {
+fn travel(input: &Vec<Command>) -> TravelState {
     input
         .iter()
-        .map(|x| Command::from(x))
         .fold(TravelState::default(), |mut state, step| {
             state.horizontal += step.horizontal;
             state.depth += step.down;
@@ -67,15 +74,14 @@ fn travel(input: &Vec<String>) -> TravelState {
         })
 }
 
-fn travel_with_aim(input: &Vec<String>) -> TravelState {
+fn travel_with_aim(input: &Vec<Command>) -> TravelState {
     // forward, aim, depth
     input
         .iter()
-        .map(|x| Command::from(x))
         .fold((TravelState::default(), 0), |mut state, step| {
             state.0.horizontal += step.horizontal;
-            state.1 += step.down;
             state.0.depth += state.1 * step.horizontal;
+            state.1 += step.down;
             state
         })
         .0
@@ -86,7 +92,7 @@ fn answer(state: TravelState) -> i32 {
 }
 
 fn main() {
-    let input = aoc::vector_from_file::<String>("input/day02/input").unwrap();
+    let input = commands_from_file("input/day02/input");
     let state = travel(&input);
     println!("Horizontal: {}; Depth: {}", state.horizontal, state.depth);
     println!("Part 1: {}", answer(state));
