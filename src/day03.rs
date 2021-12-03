@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -24,7 +23,10 @@ fn power_consumption(input: Vec<String>) -> (u32, u32) {
     }
 
     let half = (input.len() / 2) as u32;
-    let (gamma, epsilon) = bits.iter().rev().enumerate()
+    let (gamma, epsilon) = bits
+        .iter()
+        .rev()
+        .enumerate()
         .fold((0_u32, 0_u32), |mut f, x| {
             if x.1 > &half {
                 f.0 |= 1 << x.0;
@@ -43,4 +45,3 @@ fn main() {
     println!("Gamma: {}, Epsilon: {}", gamma, epsilon);
     println!("Part 1: {}", gamma * epsilon);
 }
-
