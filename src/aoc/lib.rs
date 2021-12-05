@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
+pub mod day04_parser;
+
 pub fn vector_from_file<T>(filename: &str) -> Result<Vec<T>, Box<dyn Error>>
 where
     T: FromStr,
