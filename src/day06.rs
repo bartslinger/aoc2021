@@ -22,7 +22,7 @@ fn school_from_vec(input: &Vec<u32>) -> LanternFishSchool {
 }
 
 fn step(prev: LanternFishSchool) -> LanternFishSchool {
-    let mut next: LanternFishSchool = [
+    let next: LanternFishSchool = [
         prev[1],           // 0
         prev[2],           // 1
         prev[3],           // 2
@@ -37,7 +37,7 @@ fn step(prev: LanternFishSchool) -> LanternFishSchool {
 }
 
 fn school_size(mut school: LanternFishSchool, days: usize) -> usize {
-    for day in 1..=days {
+    for _day in 1..=days {
         school = step(school);
     }
     school.into_iter().sum()
