@@ -48,4 +48,8 @@ fn main() {
     let school = school_from_vec(&input);
     let size = school_size(school, 80);
     println!("Part 1: {}", size);
+
+    let school = school_from_vec(&input);
+    let size = school_size(school, 256);
+    println!("Part 2: {}", size);
 }
