@@ -24,7 +24,7 @@ mod tests {
     #[test]
     fn test_find_overlapping_straight_lines() {
         let input = aoc::vector_from_file("input/day05/example").unwrap();
-        let count = find_overlapping_straight_lines(&input);
+        let count = find_overlapping_lines(&input, true);
         assert_eq!(count, 5);
     }
 }
@@ -76,7 +76,7 @@ impl Sub for Vector2D {
     }
 }
 
-fn find_overlapping_straight_lines(input: &Vec<String>) -> usize {
+fn find_overlapping_lines(input: &Vec<String>, only_straight: bool) -> usize {
     let lines: Vec<Line2D> = input
         .into_iter()
         .map(|x| Line2D::from_str(x.as_str()))
@@ -85,7 +85,7 @@ fn find_overlapping_straight_lines(input: &Vec<String>) -> usize {
     for line in lines {
         let diff = line.p2 - line.p1;
         let straight = diff.x == 0 || diff.y == 0;
-        if !straight {
+        if !straight && only_straight {
             continue;
         }
         let step_x = if diff.x != 0 {
@@ -123,6 +123,9 @@ fn find_overlapping_straight_lines(input: &Vec<String>) -> usize {
 
 fn main() {
     let input = aoc::vector_from_file("input/day05/input").unwrap();
-    let count = find_overlapping_straight_lines(&input);
-    println!("Part1: {}", count);
+    let count = find_overlapping_lines(&input, true);
+    println!("Part 1: {}", count);
+
+    let count = find_overlapping_lines(&input, false);
+    println!("Part 2: {}", count);
 }
