@@ -5,7 +5,7 @@ mod tests {
     #[test]
     fn test_constant_fuel() {
         let input = aoc::vector_from_comma_separated_file::<i32>("input/day07/example").unwrap();
-        let fuel = calculate_minimum_fuel_constant_rate(&input);
+        let fuel = calculate_minimum_fuel(&input, linear_fuel_cost);
         assert_eq!(fuel, 37);
     }
 
@@ -20,28 +20,20 @@ mod tests {
     #[test]
     fn test_minimum_fuel() {
         let input = aoc::vector_from_comma_separated_file::<i32>("input/day07/example").unwrap();
-        let fuel = calculate_minimum_fuel(&input);
+        let fuel = calculate_minimum_fuel(&input, fuel_cost);
         assert_eq!(fuel, 168);
     }
 }
 
-fn calculate_minimum_fuel_constant_rate(input: &Vec<i32>) -> u32 {
-    // Assuming there is a unique optimal position, this is at a location where at least one crab already is
-    input
-        .into_iter()
-        .map(|position| {
-            let fuel: u32 = input.into_iter().map(|x| (position - x).abs() as u32).sum();
-            fuel
-        })
-        .min()
-        .unwrap()
+fn linear_fuel_cost(distance: u32) -> u32 {
+    distance
 }
 
 fn fuel_cost(distance: u32) -> u32 {
     ((1 + distance) * distance) / 2
 }
 
-fn calculate_minimum_fuel(input: &Vec<i32>) -> u32 {
+fn calculate_minimum_fuel(input: &Vec<i32>, cost_function: fn(u32) -> u32) -> u32 {
     let start = *input.into_iter().min().unwrap();
     let end = *input.into_iter().max().unwrap();
     let range = start..end;
@@ -51,7 +43,7 @@ fn calculate_minimum_fuel(input: &Vec<i32>) -> u32 {
                 .into_iter()
                 .map(|x| {
                     let distance = (position - x).abs() as u32;
-                    fuel_cost(distance)
+                    cost_function(distance)
                 })
                 .sum();
             fuel
@@ -63,9 +55,9 @@ fn calculate_minimum_fuel(input: &Vec<i32>) -> u32 {
 
 fn main() {
     let input = aoc::vector_from_comma_separated_file::<i32>("input/day07/input").unwrap();
-    let fuel = calculate_minimum_fuel_constant_rate(&input);
+    let fuel = calculate_minimum_fuel(&input, linear_fuel_cost);
     println!("Part 1: {}", fuel);
 
-    let fuel = calculate_minimum_fuel(&input);
+    let fuel = calculate_minimum_fuel(&input, fuel_cost);
     println!("Part 2: {}", fuel);
 }
